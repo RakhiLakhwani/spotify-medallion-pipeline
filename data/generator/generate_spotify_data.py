@@ -47,7 +47,7 @@ def generate_tracks(n: int, artist_ids: list[str]) -> list[dict]:
             duration_ms = -1*random.randint(1000,5000)
         
         else:
-            duration_ms = -1*random.randint(60_000, 300_000)
+            duration_ms = 1*random.randint(60_000, 300_000)
 
         # ~1% get an out-of-range popularity (valid domain is 0–100).
         if random.random() < 0.01:

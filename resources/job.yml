@@ -9,3 +9,8 @@ resources:
             base_parameters:
               catalog: ${var.catalog}
               schema_prefix: ${var.schema_prefix}
+        - task_key: silver_clean
+          depends_on: [{ task_key: bronze_ingest }]      # runs only after bronze succeeds
+          notebook_task:
+            notebook_path: ../notebooks/02_silver_clean.py
+            base_parameters: { catalog: ${var.catalog}, schema_prefix: ${var.schema_prefix} }
