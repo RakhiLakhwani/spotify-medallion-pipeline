@@ -8,7 +8,6 @@ import argparse
 import csv
 import random
 import os
-from datetime import datetime, timedelta
 from faker import Faker
 
 fake = Faker()

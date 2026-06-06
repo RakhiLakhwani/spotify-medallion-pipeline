@@ -1,0 +1,39 @@
+name: Ephemeral Sandbox
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+jobs:
+  # ---- create / update the sandbox while the PR is open ----
+  deploy-sandbox:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    environment: dev                       # reuse the same SP/workspace secrets
+    env:
+      BUNDLE_VAR_dev_user:      ${{ github.head_ref }}    # branch = isolation key
+      DATABRICKS_HOST:          ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID:     ${{ vars.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@main
+      - run: databricks bundle deploy -t local
+      - run: databricks bundle run spotify_batch_medallion -t local
+
+  # ---- tear it down when the PR closes (merged or not) ----
+  destroy-sandbox:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      BUNDLE_VAR_dev_user:      ${{ github.head_ref }}
+      DATABRICKS_HOST:          ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID:     ${{ vars.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@main
+      - run: databricks bundle destroy -t local --auto-approve
+      # plus drop the runtime-created data schema (bundle destroy doesn't own it):
+      # DROP SCHEMA IF EXISTS spotify_local.<sanitized head_ref>_bronze CASCADE

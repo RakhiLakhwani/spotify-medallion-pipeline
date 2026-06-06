@@ -1,0 +1,11 @@
+resources:
+  jobs:
+    spotify_batch_medallion:
+      name: "[${var.schema_prefix}] spotify-batch-medallion"
+      tasks:
+        - task_key: bronze_ingest
+          notebook_task:
+            notebook_path: ../notebooks/01_bronze_ingest.py   # note the ../
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_prefix: ${var.schema_prefix}

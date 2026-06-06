@@ -1,0 +1,35 @@
+bundle:
+  name: spotify-medallion
+
+include:
+  - resources/*.yml          # pulls in everything under resources/
+
+variables:
+  catalog:       { default: spotify_dev }
+  dev_user:      { default: local }
+  schema_prefix: { default: "" }
+
+targets:
+  local:
+    mode: development
+    default: true                 # local is the default when you deploy by hand
+    workspace:
+      # every contributor's sandbox nests under local/<actor> — isolated state per person
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/local/${var.dev_user}
+    variables:
+      catalog: spotify_local
+      schema_prefix: ${var.dev_user}      # spotify_local.<actor>_bronze
+
+  dev:
+    mode: development
+    variables:
+      catalog: spotify_dev
+      schema_prefix: ""                   # SHARED — no per-user prefix → spotify_dev.bronze
+
+  stage:
+    mode: production
+    variables: { catalog: spotify_stage, schema_prefix: "" }
+
+  prod:
+    mode: production
+    variables: { catalog: spotify_prod,  schema_prefix: "" }
