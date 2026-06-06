@@ -18,3 +18,4 @@ jobs:
       - uses: databricks/setup-cli@main
       - run: databricks bundle validate -t dev
       - run: databricks bundle deploy -t dev
+      - run: databricks bundle run spotify_batch_medallion -t dev
