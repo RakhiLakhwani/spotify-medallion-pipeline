@@ -1,0 +1,7 @@
+line-length = 100
+
+[lint]
+ignore = ["E402"]
+
+[lint.per-file-ignores]
+"notebooks/**" = ["F821"]   # spark, dbutils, display are injected by the Databricks runtime

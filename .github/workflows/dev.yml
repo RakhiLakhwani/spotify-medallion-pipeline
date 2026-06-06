@@ -1,0 +1,20 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [main]      # deploy to dev when code lands on main
+  workflow_dispatch: {}   # also allow manual runs from the Actions tab
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DATABRICKS_HOST:          ${{ vars.DATABRICKS_HOST }}
+      DATABRICKS_CLIENT_ID:     ${{ vars.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@main
+      - run: databricks bundle validate -t dev
+      - run: databricks bundle deploy -t dev
