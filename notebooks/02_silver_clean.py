@@ -32,7 +32,9 @@ def upsert(df: DataFrame, table: str, key: str) -> None:
     else:
         (DeltaTable.forName(spark, table).alias("t")
             .merge(df.alias("s"), f"t.{key} = s.{key}")
-            .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute())
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute())
 
 
 def split_valid(df: DataFrame, checks: list):
